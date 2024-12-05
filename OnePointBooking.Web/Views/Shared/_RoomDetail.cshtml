@@ -1,0 +1,107 @@
+﻿@using System.Globalization
+@model Room
+
+<div class="row">
+    <div class="col-12 col-md-5">
+        <img src="@Model.ImageUrl" style="border-radius:10px;" width="100%" />
+    </div>
+    <div class="col-12 col-md-7">
+        <div class="row p-2" style="padding: 10px;">
+            <div class="col-12">
+                <h2 class="card-title text-warning" style="font-size:xx-large">@Model.Name</h2>
+                <h3 class="card-title text-warning" style="font-size: large; font-weight: normal;">@Model.Floor</h3>
+                <p class="card-text" style="font-size:">
+                    @Html.Raw(Model.Description)
+                </p>
+                @if (Model.RoomSetup != null && Model.RoomSetup.Any())
+                {
+                    <p class="h5 text-white">Room Setups</p>
+                    <ul>
+                        @foreach (var roomSetup in Model.RoomSetup)
+                        {
+                            <li>Type: @roomSetup.Type - Capacity: @roomSetup.Capacity</li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+        <div class="row col-12">
+            <span class="text-end p-0 pt-3 m-0">
+                <span class="float-right">Max Occupancy: @Model.Capacity </span><br />
+                <p class="text-warning font-weight-bold pt-1">
+                    <span style="color: #ff6a00;">
+                        @Model.Price.ToString("C", new CultureInfo("id-ID")) per day
+                    </span>
+                </p>
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Toggle Button for Room Packages -->
+<div class="text-center pt-3">
+    <button type="button" onclick="togglePackages(@Model.Id)" class="btn btn-link" style="font-size: 3rem; color: green; display: inline-block; width: 100%; outline: none; box-shadow: none;">
+        <i id="chevronIcon-@(Model.Id)" class="bi bi-chevron-double-down" style="float: right; margin-right: 10px;"></i>
+    </button>
+</div>
+
+<!-- Room Packages Section -->
+<div id="roomPackages-@(Model.Id)" class="room-packages" style="display: none;">
+    <h4 class="mt-1">Room Packages</h4>
+    @if (Model.RoomPackage != null && Model.RoomPackage.Any())
+    {
+        <div class="row">
+            @foreach (var package in Model.RoomPackage)
+            {
+                <div class="col-12 col-md-4 mb-3">
+                    <div class="card room-package-card" style="border: 1px solid green; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+                        <div class="card-body">
+                            <h5 class="card-title">@package.PackageName</h5>
+                            <p class="card-text">Total Price: @package.TotalPrice.ToString("C", new CultureInfo("id-ID"))</p>
+
+                            @if (package.RoomAmenity != null && package.RoomAmenity.Any())
+                            {
+                                <h6>Amenities:</h6>
+                                <ul>
+                                    @foreach (var amenity in package.RoomAmenity)
+                                    {
+                                        @if (amenity.Price > 0)
+                                        {
+                                            <li>@amenity.Name - @amenity.Price.ToString("C", new CultureInfo("id-ID"))</li>
+                                        }
+                                        else
+                                        {
+                                            <li>@amenity.Name</li>
+                                        }
+                                    }
+                                </ul>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No packages available for this room.</p>
+    }
+
+</div>
+
+<script>
+    function togglePackages(roomId) {
+        var roomPackages = document.getElementById("roomPackages-" + roomId);
+        var chevronIcon = document.getElementById("chevronIcon-" + roomId);
+
+        if (roomPackages.style.display === "none") {
+            roomPackages.style.display = "block";
+            chevronIcon.classList.remove("bi-chevron-double-down");
+            chevronIcon.classList.add("bi-chevron-double-up");
+        } else {
+            roomPackages.style.display = "none";
+            chevronIcon.classList.remove("bi-chevron-double-up");
+            chevronIcon.classList.add("bi-chevron-double-down");
+        }
+    }
+</script>

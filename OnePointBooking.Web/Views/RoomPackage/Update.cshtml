@@ -1,0 +1,89 @@
+﻿@model RoomPackageVM
+
+<div class="w-100 card border-0 p-4">
+    <div class=" card-header bg-success  bg-gradient  m-lg-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-white py-2"> Update Room Package</h2>
+            </div>
+        </div>
+    </div>
+    <div class="card-body border p-4">
+        <form method="post" class="row">
+            <input asp-for="RoomPackage.RoomPackageId" hidden />
+            <div class="p-3">
+                @* <div asp-validation-summary="All"></div> *@
+                <div class="form-floating py-1  col-12">
+                    <select asp-for="@Model.RoomPackage.RoomId" asp-items="@Model.RoomList"
+                            class="form-select border shadow">
+                        <option disabled selected>--Select Room--</option>
+                    </select>
+                    <label asp-for="RoomPackage.RoomId" class="ms-2"></label>
+                    <span asp-validation-for="RoomPackage.RoomId" class="text-danger"></span>
+                </div>
+                
+                <div class="form-floating py-1  col-12">
+                    <input asp-for="RoomPackage.PackageName" class="form-control border shadow" />
+                    <label asp-for="RoomPackage.PackageName" class="ms-2"></label>
+                    <span asp-validation-for="RoomPackage.PackageName" class="text-danger"></span>
+
+                </div>
+
+                <div class="form-floating py-1  col-12">
+                    <input asp-for="RoomPackage.BasePrice" class="form-control border shadow" />
+                    <label asp-for="RoomPackage.BasePrice" class="ms-2"></label>
+                    <span asp-validation-for="RoomPackage.BasePrice" class="text-danger"></span>
+
+                </div>
+
+                <div class="form-floating py-1  col-12">
+                    <input asp-for="RoomPackage.EffectiveDate" type="date" class="form-control border shadow" />
+                    <label asp-for="RoomPackage.EffectiveDate" type="date" class="ms-2"></label>
+                    <span asp-validation-for="RoomPackage.EffectiveDate" type="date" class="text-danger"></span>
+
+                </div>
+
+                <div class="form-floating py-1  col-12">
+                    <input asp-for="RoomPackage.ExpiredDate" type="date" class="form-control border shadow" />
+                    <label asp-for="RoomPackage.ExpiredDate" type="date" class="ms-2"></label>
+                    <span asp-validation-for="RoomPackage.ExpiredDate" type="date" class="text-danger"></span>
+
+                </div>
+                <!-- Checkbox for IsKalventis -->
+                <div class="form-check py-2">
+                    <input type="checkbox" class="form-check-input" asp-for="IsKalventis" />
+                    <label class="form-check-label" for="IsKalventis">Is Kalventis Package</label>
+                    <span asp-validation-for="RoomPackage.IsKalventis" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating py-1 col-12">
+                    <select asp-for="RoomPackage.Status" asp-items="Model.StatusList" class="form-select border shadow">
+                        <option disabled selected>--Select Status--</option>
+                    </select>
+                    <label asp-for="RoomPackage.Status" class="ms-2"></label>
+                    <span asp-validation-for="RoomPackage.Status" class="text-danger"></span>
+                </div>
+
+                <div class="row pt-2">
+                    <div class="col-6 col-md-3 ">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-check-circle"></i> Update
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3 ">
+                        <a asp-controller="RoomPackage" asp-action="Index" class="btn btn-danger w-100">
+                            <i class="bi bi-check-circle"></i> Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+
+}

@@ -1,0 +1,75 @@
+﻿@model Room
+
+<div class="w-100 card border-0 p-4">
+    <div class=" card-header bg-success  bg-gradient  m-lg-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-white py-2"> Delete Room</h2>
+            </div>
+        </div>
+    </div>
+    <div class="card-body border p-4">
+        
+        <form method="post" class="row" >
+            <input asp-for="Id" hidden />
+            <div class="p-3">
+                @* <div asp-validation-summary="All"></div> *@
+                <div class="form-floating py-1  col-12">
+                    <input asp-for="Name" disabled class="form-control border shadow" />
+                    <label asp-for=" Name" class="ms-2"></label>
+                </div>
+                <div class="form-floating py-1  col-12">
+                    <input asp-for="Description" disabled class="form-control border shadow" />
+                    <label asp-for=" Description" class="ms-2">Description</label>
+
+                </div>
+                <div class="form-floating py-1  col-12">
+                    <input asp-for="Price" disabled class="form-control border shadow" />
+                    <label asp-for="Price" class="ms-2"></label>
+
+                </div>
+                <div class="form-floating py-1  col-12">
+                    <input asp-for="Location" disabled class="form-control border shadow" />
+                    <label asp-for="Location" class="ms-2"></label>
+
+                </div>
+
+                <div class="form-floating py-1  col-12">
+                    <input asp-for="Floor" disabled class="form-control border shadow" />
+                    <label asp-for="Floor" class="ms-2"></label>
+
+                </div>
+                <div class="form-floating py-1  col-12">
+                    <input asp-for="Company" disabled class="form-control border shadow" />
+                    <label asp-for="Company" class="ms-2"></label>
+
+                </div>
+                <div class="form-floating py-1  col-12">
+                    <input asp-for="Capacity" disabled  class="form-control border shadow" />
+                    <label asp-for="Capacity" class="ms-2"></label>
+
+                </div>
+                
+                <div class="row pt-2">
+                    <div class="col-6 col-md-3 ">
+                        <button type="submit" class="btn btn-danger w-100">
+                            <i class="bi bi-check-circle"></i> Delete
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3 ">
+                        <a asp-controller="Room" asp-action="Index" class="btn btn-secondary w-100">
+                            <i class="bi bi-check-circle"></i> Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+
+}

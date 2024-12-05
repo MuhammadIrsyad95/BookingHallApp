@@ -1,0 +1,176 @@
+﻿@model IEnumerable<Booking>
+@using System.Globalization
+@using System.Security.Claims
+
+@{
+    var status = ViewBag.Status;
+    var approved = "";
+    var pending = "";
+    var completed = "";
+    var cancelled = "";
+    var all = "";
+
+    string textColor = User.IsInRole(SD.Role_Admin) ? "text-white" : "text-dark"; // Set text color based on role
+
+    switch (status)
+    {
+        case SD.StatusPending:
+            pending = "bg-success " + textColor;
+            break;
+        case SD.StatusApproved:
+            approved = "bg-success " + textColor;
+            break;
+        case SD.StatusCompleted:
+            completed = "bg-success " + textColor;
+            break;
+        case SD.StatusCancelled:
+            cancelled = "bg-success " + textColor;
+            break;
+        default:
+            all = "bg-success " + textColor; // Highlight "All" button when no specific status is selected
+            break;
+    }
+}
+
+<style>
+    .status-link {
+        text-decoration: none; /* No underline */
+        color: inherit; /* Use the current color */
+    }
+</style>
+
+<div class="w-100 card border-0 p-4">
+    <div class="card-header bg-success bg-gradient m-lg-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-white py-2">Booking List</h2>
+            </div>
+        </div>
+    </div>
+    <div class="card-body border p-4">
+        <div class="d-flex justify-content-between pb-4 pt-2">
+            <div class="input-group" style="width: 250px;">
+                <input type="text" class="form-control" placeholder="Search by Name" aria-label="Search by Name" id="searchInput">
+                <button class="btn btn-outline-success" type="button" id="searchButton">Search</button>
+            </div>
+            <ul class="list-group list-group-horizontal-sm">
+                <li class="list-group-item @all">
+                    <a class="status-link" asp-controller="Booking" asp-action="Index">
+                        All
+                    </a>
+                </li>
+                <li class="list-group-item @pending">
+                    <a class="status-link" asp-controller="Booking" asp-action="Index" asp-route-statusFilterList="@SD.StatusPending">
+                        @SD.StatusPending
+                    </a>
+                </li>
+                <li class="list-group-item @approved">
+                    <a class="status-link" asp-controller="Booking" asp-action="Index" asp-route-statusFilterList="@SD.StatusApproved">
+                        @SD.StatusApproved
+                    </a>
+                </li>
+                <li class="list-group-item @completed">
+                    <a class="status-link" asp-controller="Booking" asp-action="Index" asp-route-statusFilterList="@SD.StatusCompleted">
+                        @SD.StatusCompleted
+                    </a>
+                </li>
+                <li class="list-group-item @cancelled">
+                    <a class="status-link" asp-controller="Booking" asp-action="Index" asp-route-statusFilterList="@SD.StatusCancelled">
+                        @SD.StatusCancelled
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>
+                        <a href="@Url.Action("Index", "Booking", new { sortOrder = ViewBag.SortOrder == "Name_asc" ? "Name_desc" : "Name_asc", userId = ViewBag.UserId, statusFilterList = ViewBag.Status })" style="text-decoration: none; color: inherit;">
+                            Name
+                            @if (ViewBag.SortOrder == "Name_asc")
+                            {
+                                <i class="bi bi-arrow-down"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-arrow-up"></i>
+                            }
+                        </a>
+                    </th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    
+                    <th>
+                        <a href="@Url.Action("Index", "Booking", new { sortOrder = ViewBag.SortOrder == "StartDate_asc" ? "StartDate_desc" : "StartDate_asc", userId = ViewBag.UserId, statusFilterList = ViewBag.Status })" style="text-decoration: none; color: inherit;">
+                            Start Date
+                            @if (ViewBag.SortOrder == "StartDate_asc")
+                            {
+                                <i class="bi bi-arrow-down"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-arrow-up"></i>
+                            }
+                        </a>
+                    </th>
+                    <th>End Date</th>
+                    <th>Days</th>
+                    <th>Room</th>
+                    <th>Total Cost</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var booking in Model)
+                {
+                    if (User.IsInRole(SD.Role_Admin) || booking.UserId == User.FindFirst(ClaimTypes.NameIdentifier).Value)
+                    {
+                        <tr>
+                            <td>@booking.Id</td>
+                            <td>@booking.User.Name</td>
+                            <td>@booking.User.Email</td>
+                            <td>@booking.User.PhoneNumber</td>
+                            <td>@booking.StartDate.ToString("d")</td>
+                            <td>@booking.EndDate.ToString("d")</td>
+                            <td>@booking.Days</td>
+                            <td>@booking.Room.Name</td>
+                            <td>@booking.TotalCost.ToString("C0", new CultureInfo("id-ID"))</td>
+                            <td>@booking.Status</td>
+                            <td>
+                                <a href="@Url.Action("BookingDetails", "Booking", new { bookingId = booking.Id })" class="btn btn-outline-warning">
+                                    <i class="bi bi-pencil-square"></i> Details
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("searchButton").addEventListener("click", function () {
+            var searchValue = document.getElementById("searchInput").value;
+            var userId = '@ViewBag.UserId';
+            var statusFilterList = '@ViewBag.Status';
+            var sortOrder = '@ViewBag.SortOrder';
+
+            var queryString = '?search=' + encodeURIComponent(searchValue);
+
+            if (userId) {
+                queryString += '&userId=' + encodeURIComponent(userId);
+            }
+            if (statusFilterList) {
+                queryString += '&statusFilterList=' + encodeURIComponent(statusFilterList);
+            }
+            queryString += '&sortOrder=' + encodeURIComponent(sortOrder);
+
+            window.location.href = '@Url.Action("Index", "Booking")' + queryString;
+        });
+    </script>
+}

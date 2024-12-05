@@ -1,0 +1,68 @@
+﻿@model Booking
+@using System.Globalization
+
+@{
+    // Cek apakah pengguna adalah admin
+    var isAdmin = User.IsInRole(SD.Role_Admin);
+}
+
+<div class="container pt-4 mt-0 mt-lg-4" style="background-color: @(isAdmin ? "darkgrey" : "white");">
+    <div class="row" style="border: 1px solid #aaa; border-radius: 20px; background-color: @(isAdmin ? "#444" : "white");">
+
+        <!-- Left Column: Room Details -->
+        <div class="col-12 col-lg-6 p-4 mt-2 mt-md-0">
+            <h3 class="text-success">Room Details</h3>
+            <img src="@Model?.Room?.ImageUrl" style="border-radius:10px; width: 100%;" />
+            <h2 class="text-warning mt-3" style="font-size:xx-large">@Model?.Room?.Name</h2>
+            <p class="text-muted" style="font-size:large; font-weight:normal;">@Model?.Room?.Floor</p> <!-- Menampilkan Floor -->
+            <p style="font-size:large">@Html.Raw(Model?.Room?.Description)</p>
+
+            <!-- Display Base Room Price -->
+            <div class="form-group">
+                <label class="text-warning">Room Price (Base Price):</label>
+                <p class="text-success" style="font-size:large">
+                    @Model?.Room?.Price.ToString("C", new CultureInfo("id-ID")) per day
+                </p>
+            </div>
+
+            <!-- Room Setup Selection -->
+            <div class="form-group">
+                <label class="text-warning">Room Setup Selected:</label>
+                <p>@Model?.RoomSetup?.Type - Capacity: @Model?.RoomSetup?.Capacity</p>
+            </div>
+            <hr />
+        </div>
+
+        <!-- Right Column: Room Package Details -->
+        <div class="col-12 col-lg-6 p-4 mt-4 mt-md-0" style="border-left:1px solid #aaa; background-color: @(isAdmin ? "#555" : "white");">
+            <h3 class="text-success">Room Package Selected</h3>
+            <div class="card mt-3" style="border: 1px solid green; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">@Model?.RoomPackage?.PackageName</h5>
+                    <p class="card-text">
+                        Total Price: @Model?.RoomPackage?.TotalPrice.ToString("C", new CultureInfo("id-ID"))
+                    </p>
+
+                    @if (Model?.RoomPackage?.RoomAmenity != null && Model.RoomPackage.RoomAmenity.Any())
+                    {
+                        <h6>Amenities:</h6>
+                        <ul>
+                            @foreach (var amenity in Model.RoomPackage.RoomAmenity)
+                            {
+                                <li>
+                                    @amenity.Name
+                                    @if (amenity.Price > 0)
+                                    {
+                                        @("- " + amenity.Price.ToString("C", new CultureInfo("id-ID")))
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    }
+                    
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

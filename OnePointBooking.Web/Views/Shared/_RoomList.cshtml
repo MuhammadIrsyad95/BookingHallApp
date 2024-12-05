@@ -1,0 +1,121 @@
+﻿@using System.Globalization
+@model HomeVM
+
+@{
+    bool isAdmin = User.IsInRole("Admin");
+}
+
+<div id="RoomsList">
+    <div class="row px-lg-5 m-lg-4 m-sm-0 px-sm-0" style="--bs-gutter-x:0">
+        @foreach (var room in Model.RoomList)
+        {
+            <div class="p-4 col-md-12 col-lg-6">
+                <div class="row card-room @(isAdmin ? "bg-dark text-white" : "bg-light text-dark")" style="border-radius:15px; border: 1px solid #ddd; min-height: 280px; max-height: 280px; overflow: hidden;">
+                    <div class="col-4 p-2">
+                        <img class="d-block w-100" style="border-radius:15px;" src="@room.ImageUrl">
+                    </div>
+                    <div class="col-8">
+                        <div class="d-flex justify-content-between">
+                            <p class="card-title text-warning" style="font-size:xx-large">@room.Name</p>
+                            <div class="pt-2">
+                                <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal-@(room.Id)">
+                                    Details
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-muted" style="font-size:large; font-weight:normal;">
+                            @room.Floor
+                        </p>
+                        <p class="card-text" style="min-height: 60px; max-height: 120px; overflow-y: hidden;">
+                            @Html.Raw(room.Description)
+                        </p>
+                    </div>
+                    <div class="col-12">
+                        <div class="row pb-3 pt-2">
+                            <div class="col-4">
+                                @if (Model.StartDate > DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
+                                {
+                                    if (room.isAvailable)
+                                    {
+                                        <a asp-controller="Booking" asp-action="FinalizeBooking"
+                                           asp-route-roomId="@room.Id" asp-route-startDate="@Model.StartDate"
+                                           asp-route-days="@Model.Days"
+                                           class="btn btn-success form-control btn-block">
+                                            Book
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a class="btn btn-outline-danger disabled form-control btn-block">
+                                            Occupied
+                                        </a>
+                                    }
+                                }
+                            </div>
+                            <div class="col-8">
+                                <div class="d-flex flex-column align-items-start">
+                                    <span class="small">Max Occupancy: @room.Capacity</span>
+                                    <span class="text-warning fw-bold" style="font-size:18px;">
+                                        <span class="small" style="font-size: 12px; color: gray;">Start From </span>
+                                        <span>@room.Price.ToString("c", new CultureInfo("id-ID"))</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal for Room Details -->
+            <div class="modal fade" id="exampleModal-@(room.Id)" tabindex="-1" aria-labelledby="exampleModalLabel-@(room.Id)" aria-hidden="true">
+                <div class="modal-dialog modal-xl" style="border: 1px solid #aaa; border-radius:7px;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-3 text-success" id="exampleModalLabel-@(room.Id)">Room Details - @room.Name</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body m-0">
+                            <partial name="_RoomDetail" model="@room" />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    /* Card Styling */
+    .card-room {
+        background-color: #f0f0f0; /* Warna abu solid */
+        box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+        .card-room:hover {
+            transform: scale(1.05);
+            box-shadow: 4px 4px 25px rgba(0, 0, 0, 0.2);
+        }
+
+    /* Button Hover */
+    .btn-outline-success:hover {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .btn-outline-danger.disabled {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    /* Card Title Styling */
+    .card-room .card-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+</style>

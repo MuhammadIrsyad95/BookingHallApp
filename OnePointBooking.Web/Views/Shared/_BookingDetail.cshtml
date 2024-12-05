@@ -1,0 +1,109 @@
+﻿@model Booking
+@using System.Globalization
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-md-5">
+            <img src="@Model?.Room?.ImageUrl" style="border-radius:10px;" width="100%" />
+        </div>
+        <div class="col-12 col-md-7">
+            <h2 class="text-warning" style="font-size:xx-large">@Model?.Room?.Name</h2>
+            <h3 class="card-title text-warning" style="font-size: large; font-weight: normal;">@Model?.Room?.Floor</h3>
+            <p style="font-size:large">@Html.Raw(Model?.Room?.Description ?? "No description available.")</p>
+
+            <div class="form-group">
+                <label class="text-warning">Room Price:</label>
+                <p class="text-success" style="font-size:large">
+                    @(Model?.Room?.Price.ToString("C", new CultureInfo("id-ID")) ?? "N/A") per day
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label for="RoomSetup" class="text-success">Choose Room Setup</label>
+                <select id="RoomSetup" class="form-control" onchange="updateTotalCost()">
+                    @if (Model?.Room?.RoomSetup != null && Model.Room.RoomSetup.Any())
+                    {
+                        @foreach (var setup in Model.Room.RoomSetup)
+                        {
+                            <option value="@setup.RoomSetupId">@setup.Type - Capacity: @setup.Capacity</option>
+                        }
+                    }
+                    else
+                    {
+                        <option>No room setups available.</option>
+                    }
+                </select>
+            </div>
+
+            <h4 class="mt-3 text-success">Room Packages</h4>
+            <div class="form-group mb-4">
+                <label for="RoomPackage" class="text-warning">Choose a Package</label>
+                <select id="RoomPackage" class="form-control" onchange="updateTotalCost()">
+                    <option value="">Select a package</option>
+                    @if (Model?.Room?.RoomPackage != null && Model.Room.RoomPackage.Any())
+                    {
+                        @foreach (var package in Model.Room.RoomPackage)
+                        {
+                            <option value="@package.RoomPackageId" data-price="@package.TotalPrice"
+                                    data-amenities='@Html.Raw(Json.Serialize(package.RoomAmenity?.Select(a => a.Name) ?? Enumerable.Empty<string>()))'>
+                                @package.PackageName - Total Price: @package.TotalPrice.ToString("C", new CultureInfo("id-ID"))
+                            </option>
+                        }
+                    }
+                    else
+                    {
+                        <option>No packages available.</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Container for selected package details -->
+            <div id="selectedRoomPackage" class="mt-3">
+                <!-- Selected package details will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Room Packages Section: Display all cards centered -->
+    <div id="roomPackages" class="mt-3">
+        <h4 class="mt-1 text-success text-center" style="font-size: xx-large;">Room Packages Detail</h4>
+        <div class="row justify-content-center">
+            @if (Model?.Room?.RoomPackage != null && Model.Room.RoomPackage.Any())
+            {
+                @foreach (var package in Model.Room.RoomPackage)
+                {
+                    <div class="col-12 col-md-6 mb-3 room-package-card" data-package-id="@package.RoomPackageId" style="display:none;">
+                        <div class="card" style="border: 1px solid green; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+                            <div class="card-body">
+                                <h5 class="card-title" style="font-size: large;">@package.PackageName</h5>
+                                <p class="card-text" style="font-size: large;">Total Price: @package.TotalPrice.ToString("C", new CultureInfo("id-ID"))</p>
+
+                                @if (package.RoomAmenity != null && package.RoomAmenity.Any())
+                                {
+                                    <h6>Amenities:</h6>
+                                    <ul>
+                                        @foreach (var amenity in package.RoomAmenity)
+                                        {
+                                            @if (amenity.Price > 0)
+                                            {
+                                                <li>@amenity.Name - @amenity.Price.ToString("C", new CultureInfo("id-ID"))</li>
+                                            }
+                                            else
+                                            {
+                                                <li>@amenity.Name</li>
+                                            }
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No packages available for this room.</p>
+            }
+        </div>
+    </div>
+</div>
